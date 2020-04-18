@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Vine : MonoBehaviour {
@@ -14,11 +13,6 @@ public class Vine : MonoBehaviour {
         foreach(var bud in buds) {
             bud.Move();
         }
-        gameObject.SendMessage("BudsMoved");
-    }
-
-    public List<Bud> GetBuds() {
-        return buds;
     }
 
     public void OnTurn(TurnDirection turn) {
