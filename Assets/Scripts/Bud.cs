@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Bud : MonoBehaviour {
     public enum TravelDirection {
-        Up,
-        Down,
-        Left,
-        Right,
+        Up = 0,
+        Down = 180,
+        Left = 90,
+        Right = 270,
     }
 
     public enum Turn {
@@ -41,12 +41,17 @@ public class Bud : MonoBehaviour {
 
     private void SetDirection(TravelDirection direction) {
         this.travel = direction;
-        GetComponent<Rigidbody>().velocity = GetDirectionVector(direction) * GROWTH_RATE;
+        Debug.Log(transform.rotation);
+        transform.localRotation = Quaternion.Euler(0, 0, (int) direction);
+        Debug.Log(transform.rotation);
+        Debug.Log(direction);
+        Debug.Log((int) direction);
     }
 
     public Bud Split(Turn split) {
         var newObj = GameObject.Instantiate(this.gameObject);
         var newBud = newObj.GetComponent<Bud>();
+        Debug.Log("New bud");
         newBud.gameObject.transform.position = transform.position + GetOffset(split);
         newBud.SetDirection(GetTurnDirection(split));
         return newBud;
@@ -98,6 +103,7 @@ public class Bud : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        this.transform.position += this.GetDirectionVector(this.travel) * GROWTH_RATE * Time.deltaTime;
 
     }
 }
