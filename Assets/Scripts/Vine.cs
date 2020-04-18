@@ -24,5 +24,12 @@ public class Vine : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        if (Input.GetKeyDown("z")) {
+            var newBuds = new List<Bud>();
+            foreach(var bud in buds) {
+                newBuds.Add(bud.Split(TurnDirection.Left));
+            }
+            buds.AddRange(newBuds);
+        }
     }
 }
