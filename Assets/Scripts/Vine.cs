@@ -14,6 +14,11 @@ public class Vine : MonoBehaviour {
         foreach(var bud in buds) {
             bud.Move();
         }
+        gameObject.SendMessage("BudsMoved");
+    }
+
+    public List<Bud> GetBuds() {
+        return buds;
     }
 
     public void OnTurn(TurnDirection turn) {
