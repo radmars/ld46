@@ -10,12 +10,8 @@ public class Bud : MonoBehaviour {
         Right = 270,
     }
 
-    public enum Turn {
-        Left,
-        Right,
-    }
 
-    private const float GROWTH_RATE = 1.20f;
+    private const float GRID_SIZE = 1.20f;
 
     /// I'm too lazy to just do this with vector shit and rotations.
     public TravelDirection travel = TravelDirection.Up;
@@ -48,7 +44,11 @@ public class Bud : MonoBehaviour {
         Debug.Log((int) direction);
     }
 
-    public Bud Split(Turn split) {
+    public void Turn(TurnDirection turn) {
+        SetDirection(GetTurnDirection(turn));
+    }
+
+    public Bud Split(TurnDirection split) {
         var newObj = GameObject.Instantiate(this.gameObject);
         var newBud = newObj.GetComponent<Bud>();
         Debug.Log("New bud");
@@ -57,43 +57,48 @@ public class Bud : MonoBehaviour {
         return newBud;
     }
 
-    public Vector3 GetOffset(Turn split) {
-        var dir = GetDirectionVector(GetTurnDirection(split));
-        return dir * 1.1f;
+    public void Move() {
+        // TODO GRID SIZE SHIT HERE?
+        this.transform.position += this.GetDirectionVector(this.travel) * GRID_SIZE;
+        Debug.Log("Beat me up");
+    }
+
+    public Vector3 GetOffset(TurnDirection split) {
+        return GetDirectionVector(GetTurnDirection(split)) * GRID_SIZE;
     }
 
     /// Figure out what the direction we'd be facing if we turned the given direction.
-    public TravelDirection GetTurnDirection(Turn dir) {
+    public TravelDirection GetTurnDirection(TurnDirection dir) {
         switch (this.travel) {
             case TravelDirection.Up:
                 switch (dir) {
-                    case Turn.Left:
+                    case TurnDirection.Left:
                         return TravelDirection.Left;
-                    case Turn.Right:
+                    case TurnDirection.Right:
                         return TravelDirection.Right;
                 }
                 break;
             case TravelDirection.Left:
                 switch (dir) {
-                    case Turn.Left:
+                    case TurnDirection.Left:
                         return TravelDirection.Down;
-                    case Turn.Right:
+                    case TurnDirection.Right:
                         return TravelDirection.Up;
                 }
                 break;
             case TravelDirection.Down:
                 switch (dir) {
-                    case Turn.Left:
+                    case TurnDirection.Left:
                         return TravelDirection.Right;
-                    case Turn.Right:
+                    case TurnDirection.Right:
                         return TravelDirection.Left;
                 }
                 break;
             case TravelDirection.Right:
                 switch (dir) {
-                    case Turn.Left:
+                    case TurnDirection.Left:
                         return TravelDirection.Up;
-                    case Turn.Right:
+                    case TurnDirection.Right:
                         return TravelDirection.Down;
                 }
                 break;
@@ -103,7 +108,6 @@ public class Bud : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        this.transform.position += this.GetDirectionVector(this.travel) * GROWTH_RATE * Time.deltaTime;
 
     }
 }
