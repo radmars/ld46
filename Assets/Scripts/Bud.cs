@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Bud : MonoBehaviour {
     public enum TravelDirection {
@@ -9,7 +7,6 @@ public class Bud : MonoBehaviour {
         Left = 90,
         Right = 270,
     }
-
 
     private const float GRID_SIZE = 1.20f;
 
@@ -37,11 +34,7 @@ public class Bud : MonoBehaviour {
 
     private void SetDirection(TravelDirection direction) {
         this.travel = direction;
-        Debug.Log(transform.rotation);
         transform.localRotation = Quaternion.Euler(0, 0, (int) direction);
-        Debug.Log(transform.rotation);
-        Debug.Log(direction);
-        Debug.Log((int) direction);
     }
 
     public void Turn(TurnDirection turn) {
@@ -49,22 +42,30 @@ public class Bud : MonoBehaviour {
     }
 
     public Bud Split(TurnDirection split) {
-        var newObj = GameObject.Instantiate(this.gameObject);
+        var newObj = GameObject.Instantiate(this.gameObject, transform.parent);
         var newBud = newObj.GetComponent<Bud>();
-        Debug.Log("New bud");
         newBud.gameObject.transform.position = transform.position + GetOffset(split);
         newBud.SetDirection(GetTurnDirection(split));
         return newBud;
     }
 
     public void Move() {
-        // TODO GRID SIZE SHIT HERE?
         this.transform.position += this.GetDirectionVector(this.travel) * GRID_SIZE;
-        Debug.Log("Beat me up");
     }
 
     public Vector3 GetOffset(TurnDirection split) {
         return GetDirectionVector(GetTurnDirection(split)) * GRID_SIZE;
+    }
+
+    public void OnCollisionEnter2D(Collision2D collision) {
+        if (collision.gameObject.CompareTag("fatal")) {
+            Kill();
+        }
+    }
+
+    public void Kill() {
+        Debug.Log(string.Format("{0} bud died", gameObject.name));
+        gameObject.transform.parent.SendMessage("BudDied", this);
     }
 
     /// Figure out what the direction we'd be facing if we turned the given direction.

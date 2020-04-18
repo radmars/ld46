@@ -22,6 +22,10 @@ public class Vine : MonoBehaviour {
         }
     }
 
+    public void BudDied(object bud) {
+        buds.Remove((Bud) bud);
+    }
+
     // Update is called once per frame
     void Update() {
         if (Input.GetKeyDown("z")) {
