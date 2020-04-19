@@ -7,12 +7,14 @@ public class CameraChase : MonoBehaviour {
     public new Camera camera;
     private Vector3 desiredPosition;
     private float updateStart = -1;
+    private float startingHeight = 0;
 
     private TilePlant vine;
 
     // Start is called before the first frame update
     void Start() {
         vine = GetComponent<TilePlant>();
+        startingHeight = camera.transform.position.y;
     }
 
     public void BudsMoved() {
@@ -23,7 +25,11 @@ public class CameraChase : MonoBehaviour {
                 desiredPosition += new Vector3(bud.location.x, bud.location.y, 0) / (float)buds.Count;
             }
 
-            desiredPosition = new Vector3(desiredPosition.x, desiredPosition.y, camera.transform.position.z);
+            desiredPosition = new Vector3(
+                desiredPosition.x,
+                Mathf.Max(startingHeight, desiredPosition.y),
+                camera.transform.position.z
+            );
             updateStart = Time.fixedUnscaledTime;
         }
     }
