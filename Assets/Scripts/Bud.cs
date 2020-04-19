@@ -12,12 +12,10 @@ public class Bud {
     public Vector3Int location;
 
     public void Grow(TilePlant plant) {
+        // TODO Add self collision.
         var newHeading = GetNewHeading(nextType);
         var newLocation = Travel(newHeading);
         var newPhase = GetNewPhase();
-
-        Debug.Log(string.Format("Moving from {0} which is a {1}-{2} in {3}", location, phase, nextType, travel));
-        Debug.Log(string.Format("Going to {0} as a {1}-{2} in {3}", newLocation, newPhase, PlantTileType.Bud, newHeading));
 
         plant.UpdateLocation(location, phase, nextType, travel);
         plant.UpdateLocation(newLocation, newPhase, PlantTileType.Bud, newHeading);

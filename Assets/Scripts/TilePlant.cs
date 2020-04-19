@@ -21,12 +21,14 @@ public class TilePlant : MonoBehaviour {
     private List<Bud> buds;
     private Grid grid;
     private Tilemap tilemap;
+    private TileStage stage;
     private Dictionary<PlantTilePhase, Dictionary<PlantTileType, TileBase>> tileLookup;
 
     // Start is called before the first frame update
     void Start() {
         buds = new List<Bud>();
         buds.Add(new Bud());
+        stage = GetComponent<TileStage>();
 
         grid = GetComponent<Grid>();
         tilemap = GameObject.Find("Tilemap_Plant").GetComponent<Tilemap>();
@@ -51,10 +53,6 @@ public class TilePlant : MonoBehaviour {
         };
     }
 
-    public void BudDied(object bud) {
-        buds.Remove((Bud) bud);
-    }
-
     // Update is called once per frame
     void Update() {
         if (Input.GetKeyDown("z")) {
@@ -72,10 +70,37 @@ public class TilePlant : MonoBehaviour {
 
     // Methods that receive from invocations of "SendMessage"
     public void OnBeat() {
-        foreach (var bud in buds) {
+        var died = new List<Bud>();
+        var budsToCheck = new List<Bud>(buds);
+
+        foreach (var bud in budsToCheck) {
             bud.Grow(this);
+            CheckCollision(bud);
         }
+
+        foreach(var dead in died) {
+            buds.Remove(dead);
+        }
+
         gameObject.SendMessage("BudsMoved");
+    }
+
+    private void CheckCollision(Bud bud) {
+        var collision = stage.TileAt(bud.location);
+        switch(collision) {
+            case StageTile.Blank:
+                return;
+            case StageTile.Dirt:
+            case StageTile.Spike:
+                buds.Remove(bud);
+                return;
+            case StageTile.Splitter:
+                bud.Split();
+                return;
+            default:
+                Debug.LogError("Missing collision case");
+                return;
+        }
     }
 
     public List<Bud> GetBuds() {
