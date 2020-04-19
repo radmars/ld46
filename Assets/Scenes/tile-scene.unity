@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 74369198}
   - component: {fileID: 74369197}
   - component: {fileID: 74369196}
+  - component: {fileID: 74369199}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -174,7 +175,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 6
+  orthographic size: 5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -204,6 +205,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &74369199
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74369195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51b547e3beedd2156a85387e3c69bc2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sprites:
+  - {fileID: 21300000, guid: 04686c52491c72ad98b96114177cfaca, type: 3}
+  - {fileID: 21300000, guid: 220aa4dbe7df589549de8bcadf32efe7, type: 3}
+  - {fileID: 21300000, guid: 0b7dd569806a540e9952cfb805e12940, type: 3}
 --- !u!1 &621219203
 GameObject:
   m_ObjectHideFlags: 0
@@ -786,6 +803,7 @@ GameObject:
   - component: {fileID: 984417573}
   - component: {fileID: 984417575}
   - component: {fileID: 984417576}
+  - component: {fileID: 984417577}
   m_Layer: 0
   m_Name: Grid
   m_TagString: Untagged
@@ -845,7 +863,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4196c4bfc47c0b247a3d7c046e8fdffd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  location: {x: 0, y: 0, z: 0}
   budA: {fileID: 11400000, guid: 92ce36ebbd58096479687c04df3d1b6c, type: 2}
   budB: {fileID: 11400000, guid: 3181bf32f093f6b41bdc9c414998b8b2, type: 2}
   straightA: {fileID: 11400000, guid: bddc4a0c4a746be469cfc9edf6e0e60f, type: 2}
@@ -856,3 +873,16 @@ MonoBehaviour:
   leftB: {fileID: 11400000, guid: 4d49a75c871fa5f4f915ab775d63869a, type: 2}
   teeA: {fileID: 11400000, guid: 0b114d0649ff8a9429089a8b9e18ae36, type: 2}
   teeB: {fileID: 11400000, guid: 1afb87b68db25324098066b6bf20681b, type: 2}
+--- !u!114 &984417577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 984417572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15d6d216fe8e871d19abce6950982c70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  camera: {fileID: 74369197}

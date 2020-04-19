@@ -5,13 +5,14 @@ using UnityEngine;
 public class CameraChase : MonoBehaviour {
 
     public new Camera camera;
-    public Vector3 desiredPosition;
-    public float updateStart = -1;
-    private Vine vine;
+    private Vector3 desiredPosition;
+    private float updateStart = -1;
+
+    private TilePlant vine;
 
     // Start is called before the first frame update
     void Start() {
-        vine = GetComponent<Vine>();
+        vine = GetComponent<TilePlant>();
     }
 
     public void BudsMoved() {
@@ -19,7 +20,7 @@ public class CameraChase : MonoBehaviour {
         if(buds.Count > 0) {
             desiredPosition = new Vector3();
             foreach (var bud in buds) {
-                desiredPosition += bud.transform.position / buds.Count;
+                desiredPosition += new Vector3(bud.location.x, bud.location.y, 0) / (float)buds.Count;
             }
 
             desiredPosition = new Vector3(desiredPosition.x, desiredPosition.y, camera.transform.position.z);

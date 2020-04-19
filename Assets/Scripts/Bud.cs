@@ -1,71 +1,105 @@
 ﻿using UnityEngine;
+using UnityEngine.Tilemaps;
 
-public class Bud : MonoBehaviour {
-    public enum TravelDirection {
-        Up = 0,
-        Down = 180,
-        Left = 90,
-        Right = 270,
-    }
-
-    private const float GRID_SIZE = 1.20f;
-
+public class Bud {
     /// I'm too lazy to just do this with vector shit and rotations.
     public TravelDirection travel = TravelDirection.Up;
 
-    public void Start() {
-        SetDirection(this.travel);
+    private PlantTileType nextType = PlantTileType.Straight;
+
+    private PlantTilePhase phase = PlantTilePhase.A;
+
+    public Vector3Int location;
+
+    public void Grow(TilePlant plant) {
+        var newHeading = GetNewHeading(nextType);
+        var newLocation = Travel(newHeading);
+        var newPhase = GetNewPhase();
+
+        Debug.Log(string.Format("Moving from {0} which is a {1}-{2} in {3}", location, phase, nextType, travel));
+        Debug.Log(string.Format("Going to {0} as a {1}-{2} in {3}", newLocation, newPhase, PlantTileType.Bud, newHeading));
+
+        plant.UpdateLocation(location, phase, nextType, travel);
+        plant.UpdateLocation(newLocation, newPhase, PlantTileType.Bud, newHeading);
+
+        location = newLocation;
+        travel = newHeading;
+        phase = newPhase;
+        nextType = PlantTileType.Straight;
     }
 
-    public Vector3 GetDirectionVector(TravelDirection dir) {
+    // Phase swaps on straight segments, but outputs of turns and T-junctions are always phase B.
+    private PlantTilePhase GetNewPhase() {
+        if (nextType == PlantTileType.Straight) {
+            return phase == PlantTilePhase.A ? PlantTilePhase.B : PlantTilePhase.A;
+        }
+        return PlantTilePhase.B;
+    }
+
+    private Vector3Int Travel(TravelDirection direction) {
+        return location + GetDirectionVector(direction);
+    }
+
+    private TravelDirection GetNewHeading(PlantTileType nextType) {
+        switch (nextType) {
+            case PlantTileType.Straight:
+                return travel;
+            case PlantTileType.Left:
+                return GetTurnDirection(TurnDirection.Left);
+            case PlantTileType.Right:
+                return GetTurnDirection(TurnDirection.Right);
+            default:
+                throw new System.ArgumentOutOfRangeException("T junctions NYI.");
+        }
+    }
+
+    private Vector3Int GetDirectionVector(TravelDirection dir) {
         switch (dir) {
             case TravelDirection.Up:
-                return Vector3.up;
+                return Vector3Int.up;
             case TravelDirection.Down:
-                return Vector3.up * -1;
+                return Vector3Int.up * -1;
             case TravelDirection.Left:
-                return Vector3.right * -1;
-            case TravelDirection.Right:
-                return Vector3.right;
+                return Vector3Int.right * -1;
+            // case TravelDirection.Right:
             default:
-                throw new System.ArgumentOutOfRangeException("This is impossible");
+                return Vector3Int.right;
         }
     }
 
     private void SetDirection(TravelDirection direction) {
         this.travel = direction;
-        transform.localRotation = Quaternion.Euler(0, 0, (int) direction);
     }
 
     public void Turn(TurnDirection turn) {
-        SetDirection(GetTurnDirection(turn));
+        this.nextType = GetNextType(turn);
     }
 
-    public Bud Split(TurnDirection split) {
-        var newObj = GameObject.Instantiate(this.gameObject, transform.parent);
-        var newBud = newObj.GetComponent<Bud>();
-        newBud.gameObject.transform.position = transform.position + GetOffset(split);
-        newBud.SetDirection(GetTurnDirection(split));
-        return newBud;
-    }
-
-    public void Move() {
-        this.transform.position += this.GetDirectionVector(this.travel) * GRID_SIZE;
-    }
-
-    public Vector3 GetOffset(TurnDirection split) {
-        return GetDirectionVector(GetTurnDirection(split)) * GRID_SIZE;
-    }
-
-    public void OnCollisionEnter2D(Collision2D collision) {
-        if (collision.gameObject.CompareTag("fatal")) {
-            Kill();
+    private PlantTileType GetNextType(TurnDirection input) {
+        switch (input) {
+            case TurnDirection.Left:
+                switch (nextType) {
+                    case PlantTileType.Straight:
+                        return PlantTileType.Left;
+                    default:
+                        return PlantTileType.Straight;
+                }
+            default:
+                switch (nextType) {
+                    case PlantTileType.Straight:
+                        return PlantTileType.Right;
+                    default:
+                        return PlantTileType.Straight;
+                }
         }
     }
 
-    public void Kill() {
-        Debug.Log(string.Format("{0} bud died", gameObject.name));
-        gameObject.transform.parent.SendMessage("BudDied", this);
+    public Bud Split(TurnDirection split) {
+        var bud = new Bud();
+        var direction = GetTurnDirection(split);
+        bud.location = GetDirectionVector(direction) + location;
+        bud.SetDirection(direction);
+        return bud;
     }
 
     /// Figure out what the direction we'd be facing if we turned the given direction.
@@ -75,40 +109,35 @@ public class Bud : MonoBehaviour {
                 switch (dir) {
                     case TurnDirection.Left:
                         return TravelDirection.Left;
-                    case TurnDirection.Right:
+                    // case TurnDirection.Right:
+                    default: 
                         return TravelDirection.Right;
                 }
-                break;
             case TravelDirection.Left:
                 switch (dir) {
                     case TurnDirection.Left:
                         return TravelDirection.Down;
-                    case TurnDirection.Right:
+                    // case TurnDirection.Right:
+                    default:
                         return TravelDirection.Up;
                 }
-                break;
             case TravelDirection.Down:
                 switch (dir) {
                     case TurnDirection.Left:
                         return TravelDirection.Right;
-                    case TurnDirection.Right:
+                    // case TurnDirection.Right:
+                    default:
                         return TravelDirection.Left;
                 }
-                break;
-            case TravelDirection.Right:
+            // case TravelDirection.Right:
+            default:
                 switch (dir) {
                     case TurnDirection.Left:
                         return TravelDirection.Up;
-                    case TurnDirection.Right:
+                    // case TurnDirection.Right:
+                    default:
                         return TravelDirection.Down;
                 }
-                break;
         }
-        throw new System.ArgumentOutOfRangeException("This is impossible");
-    }
-
-    // Update is called once per frame
-    void Update() {
-
     }
 }

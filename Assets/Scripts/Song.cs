@@ -1,13 +1,11 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class Song : MonoBehaviour
-{
+public class Song : MonoBehaviour {
     bool playing = false;
 
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
         StartSong();
     }
 
@@ -22,15 +20,14 @@ public class Song : MonoBehaviour
     private IEnumerator PlaySong() {
         var start = Time.fixedUnscaledTime;
         playing = true;
-        while(Time.fixedUnscaledTime - start < 1000 && playing) {
+        while (Time.fixedUnscaledTime - start < 1000 && playing) {
             yield return new WaitForSecondsRealtime(.7f);
             gameObject.SendMessage("OnBeat");
         }
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         if (Input.GetKeyDown("a")) {
             gameObject.SendMessage("OnTurn", TurnDirection.Left);
         }

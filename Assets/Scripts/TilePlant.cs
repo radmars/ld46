@@ -2,9 +2,7 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class TilePlant : MonoBehaviour
-{
-    public Vector3Int location;
+public class TilePlant : MonoBehaviour {
     // I feel like there's got to be a better way to bulk set or retrieve these values. Also, this
     // is going to get _interesting_ when we try to add animations. Additionally, straightA and
     // straightB are currently reversed, so either the labels are wrong or the implementation is.
@@ -19,151 +17,84 @@ public class TilePlant : MonoBehaviour
     public TileBase teeA;
     public TileBase teeB;
 
-    enum Phase
-    {
-        A,
-        B,
-    }
-
-    enum Type
-    {
-        Bud,
-        Straight,
-        Right,
-        Left,
-        Tee,
-    }
-
     // Growth segment state information.
-    private Phase phase = Phase.A;
-    private Type nextType = Type.Straight;
-    private Vector3Int heading = Vector3Int.up;
-
+    private List<Bud> buds;
     private Grid grid;
     private Tilemap tilemap;
-    private Dictionary<Phase, Dictionary<Type, TileBase>> tileLookup;
+    private Dictionary<PlantTilePhase, Dictionary<PlantTileType, TileBase>> tileLookup;
 
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
+        buds = new List<Bud>();
+        buds.Add(new Bud());
+
         grid = GetComponent<Grid>();
         tilemap = GameObject.Find("Tilemap_Plant").GetComponent<Tilemap>();
-        tileLookup = new Dictionary<Phase, Dictionary<Type, TileBase>>
-        {
+        tileLookup = new Dictionary<PlantTilePhase, Dictionary<PlantTileType, TileBase>> {
             {
-               Phase.A, new Dictionary<Type, TileBase>
-               {
-                   { Type.Bud, budA },
-                   { Type.Straight, straightA },
-                   { Type.Right, rightA },
-                   { Type.Left, leftA },
-                   { Type.Tee, teeA },
-               }
+            PlantTilePhase.A, new Dictionary<PlantTileType, TileBase> { { PlantTileType.Bud, budA },
+            { PlantTileType.Straight, straightA },
+            { PlantTileType.Right, rightA },
+            { PlantTileType.Left, leftA },
+            { PlantTileType.Tee, teeA },
+            }
             },
             {
-                Phase.B, new Dictionary<Type, TileBase>
-               {
-                   { Type.Bud, budB },
-                   { Type.Straight, straightB },
-                   { Type.Right, rightB },
-                   { Type.Left, leftB },
-                   { Type.Tee, teeB },
-               }
+            PlantTilePhase.B,
+            new Dictionary<PlantTileType, TileBase> { { PlantTileType.Bud, budB },
+            { PlantTileType.Straight, straightB },
+            { PlantTileType.Right, rightB },
+            { PlantTileType.Left, leftB },
+            { PlantTileType.Tee, teeB },
+            }
             }
         };
     }
 
-    void Grow()
-    {
-        Vector3Int newHeading = getNewHeading(heading, nextType);
-        Vector3Int newLocation = location + newHeading;
-        Phase newPhase = getNewPhase(phase, nextType);
-
-        tilemap.SetTile(location, GetTile(phase, nextType));
-        tilemap.SetTransformMatrix(location, Matrix4x4.Rotate(Quaternion.FromToRotation(Vector3Int.up, heading)));
-        tilemap.SetTile(newLocation, GetTile(newPhase, Type.Bud));
-        tilemap.SetTransformMatrix(newLocation, Matrix4x4.Rotate(Quaternion.FromToRotation(Vector3Int.up, newHeading)));
-
-        location = newLocation;
-        heading = newHeading;
-        phase = newPhase;
-        nextType = Type.Straight;
+    public void BudDied(object bud) {
+        buds.Remove((Bud) bud);
     }
 
     // Update is called once per frame
-    void Update()
-    {
-    }
-
-    // Phase swaps on straight segments, but outputs of turns and T-junctions are always phase B.
-    private Phase getNewPhase(Phase oldPhase, Type nextType)
-    {
-        if (nextType == Type.Straight)
-        {
-            return oldPhase == Phase.A ? Phase.B : Phase.A;
-        }
-        return Phase.B;
-    }
-
-    private Vector3Int getNewHeading(Vector3Int oldHeading, Type nextType)
-    {
-        if (nextType == Type.Straight)
-        {
-            return oldHeading;
-        }
-
-        // There's gotta be a better way to rotate vectors, but Quaternions can't be used with
-        // Vector3Ints.
-        if (nextType == Type.Right)
-        {
-            return new Vector3Int(oldHeading.y, -oldHeading.x, 0);
-        }
-        else if (nextType == Type.Left)
-        {
-            return new Vector3Int(-oldHeading.y, oldHeading.x, 0);
-        }
-        else
-        {
-            throw new System.ArgumentOutOfRangeException("T junctions NYI.");
+    void Update() {
+        if (Input.GetKeyDown("z")) {
+            var newBuds = new List<Bud>();
+            foreach (var bud in buds) {
+                newBuds.Add(bud.Split(TurnDirection.Left));
+            }
+            buds.AddRange(newBuds);
         }
     }
 
-private TileBase GetTile(Phase phase, Type type)
-    {
+    private TileBase GetTile(PlantTilePhase phase, PlantTileType type) {
         return tileLookup[phase][type];
     }
 
     // Methods that receive from invocations of "SendMessage"
-    public void OnBeat()
-    {
-        Grow();
+    public void OnBeat() {
+        foreach (var bud in buds) {
+            bud.Grow(this);
+        }
+        gameObject.SendMessage("BudsMoved");
     }
 
-    public void OnTurn(TurnDirection turn)
-    {
-        if (turn == TurnDirection.Left)
-        {
-            if (nextType == Type.Straight)
-            {
-                nextType = Type.Left;
-            }
-            // Allow the player to undo a right turn.
-            else
-            {
-                nextType = Type.Straight;
-            }
+    public List<Bud> GetBuds() {
+        return buds;
+    }
+
+    public void OnTurn(TurnDirection turn) {
+        foreach (var bud in buds) {
+            bud.Turn(turn);
         }
-        else
-        {
-            if (nextType == Type.Straight)
-            {
-                nextType = Type.Right;
-            }
-            // Allow the player to undo a left turn.
-            else
-            {
-                nextType = Type.Straight;
-            }
-        }
+    }
+
+    public void UpdateLocation(Vector3Int location, PlantTilePhase phase, PlantTileType type, TravelDirection direction) {
+        tilemap.SetTile(location, GetTile(phase, type));
+        tilemap.SetTransformMatrix(
+            location,
+            Matrix4x4.Rotate(
+                Quaternion.Euler(0, 0, (int) direction)
+            )
+        );
     }
 }
