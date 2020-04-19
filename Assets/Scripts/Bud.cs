@@ -48,8 +48,10 @@ public class Bud {
                 return GetTurnDirection(TurnDirection.Left);
             case PlantTileType.Right:
                 return GetTurnDirection(TurnDirection.Right);
+            case PlantTileType.Tee:
+                return GetTurnDirection(TurnDirection.Right);
             default:
-                throw new System.ArgumentOutOfRangeException("T junctions NYI.");
+                throw new System.ArgumentOutOfRangeException(string.Format("How did we get here: {0}", nextType));
         }
     }
 
@@ -94,11 +96,14 @@ public class Bud {
         }
     }
 
-    public Bud Split(TurnDirection split) {
+    // Split a new bud to the left. "This" one will go right.
+    public Bud Split() {
         var bud = new Bud();
-        var direction = GetTurnDirection(split);
+        var direction = GetTurnDirection(TurnDirection.Left);
+        this.Turn(TurnDirection.Right);
         bud.location = GetDirectionVector(direction) + location;
         bud.SetDirection(direction);
+        nextType = PlantTileType.Tee;
         return bud;
     }
 

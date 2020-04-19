@@ -60,7 +60,7 @@ public class TilePlant : MonoBehaviour {
         if (Input.GetKeyDown("z")) {
             var newBuds = new List<Bud>();
             foreach (var bud in buds) {
-                newBuds.Add(bud.Split(TurnDirection.Left));
+                newBuds.Add(bud.Split());
             }
             buds.AddRange(newBuds);
         }
