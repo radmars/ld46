@@ -11,19 +11,63 @@ public class Bud {
 
     public Vector3Int location;
 
-    public void Grow(TilePlant plant) {
-        // TODO Add self collision.
+    // Attempt to grow this bud, taking into account possible collisions with the bounding box,
+    // existing plants, and the stage. Returns true if the growth was successful, false if the
+    // bud died attempting to grow.
+    public bool TryToGrow(TilePlant plant) {
         var newHeading = GetNewHeading(nextType);
         var newLocation = Travel(newHeading);
         var newPhase = GetNewPhase();
 
         plant.UpdateLocation(location, phase, nextType, travel);
+        if (CheckIfDied(plant, newLocation))
+        {
+            return false;
+        }
+
         plant.UpdateLocation(newLocation, newPhase, PlantTileType.Bud, newHeading);
 
         location = newLocation;
         travel = newHeading;
         phase = newPhase;
         nextType = PlantTileType.Straight;
+
+        return true;
+    }
+
+    // Returns true if the bud died as the result of a collision.
+    private bool CheckIfDied(TilePlant plant, Vector3Int location)
+    {
+        // First, worry about the world boundaries...
+        if (
+            location.x < StageConstants.leftLimit
+            || location.x > StageConstants.rightLimit
+            || location.y < StageConstants.bottomLimit
+            )
+        {
+            return true;
+        }
+        // Next, plant self-collisions...
+        if (plant.tilemap.GetTile(location) != null)
+        {
+            return true;
+        }
+
+        // Finally, stage collisions.
+        var collision = plant.stage.TileAt(location);
+        switch (collision)
+        {
+            case StageTile.Blank:
+                return false;
+            case StageTile.Spike:
+                return true;
+            case StageTile.Splitter:
+                plant.AddBud(Split());
+                return false;
+            default:
+                Debug.LogError("Missing collision case");
+                return false;
+        }
     }
 
     // Phase swaps on straight segments, but outputs of turns and T-junctions are always phase B.

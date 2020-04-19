@@ -11,6 +11,8 @@ public class TileStage : MonoBehaviour {
         tiles = new Dictionary<Vector3Int, StageTile>();
         tilemap = GameObject.Find("Tilemap_Stage").GetComponent<Tilemap>();
         var bounds = tilemap.cellBounds;
+        // We probably don't need to do this copy and can just refer to the tilemap directly, but
+        // haven't removed this yet.
         foreach (var cell in bounds.allPositionsWithin) {
             var tile = tilemap.GetTile(cell);
             if (tile != null) {

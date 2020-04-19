@@ -20,8 +20,9 @@ public class TilePlant : MonoBehaviour {
     // Growth segment state information.
     private List<Bud> buds;
     private Grid grid;
-    private Tilemap tilemap;
-    private TileStage stage;
+
+    internal Tilemap tilemap { get; private set; }
+    internal TileStage stage { get; private set; }
     private Dictionary<PlantTilePhase, Dictionary<PlantTileType, TileBase>> tileLookup;
 
     // Start is called before the first frame update
@@ -74,8 +75,11 @@ public class TilePlant : MonoBehaviour {
         var budsToCheck = new List<Bud>(buds);
 
         foreach (var bud in budsToCheck) {
-            bud.Grow(this);
-            CheckCollision(bud);
+            bool success = bud.TryToGrow(this);
+            if (!success)
+            {
+                died.Add(bud);
+            }
         }
 
         foreach(var dead in died) {
@@ -85,22 +89,9 @@ public class TilePlant : MonoBehaviour {
         gameObject.SendMessage("BudsMoved");
     }
 
-    private void CheckCollision(Bud bud) {
-        var collision = stage.TileAt(bud.location);
-        switch(collision) {
-            case StageTile.Blank:
-                return;
-            case StageTile.Dirt:
-            case StageTile.Spike:
-                buds.Remove(bud);
-                return;
-            case StageTile.Splitter:
-                bud.Split();
-                return;
-            default:
-                Debug.LogError("Missing collision case");
-                return;
-        }
+    public void AddBud(Bud bud)
+    {
+        buds.Add(bud);
     }
 
     public List<Bud> GetBuds() {
