@@ -289,8 +289,8 @@ TilemapRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 54501055
+  m_SortingLayer: -1
   m_SortingOrder: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
@@ -441,7 +441,7 @@ Tilemap:
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: -9, y: -5, z: 0}
-  m_Size: {x: 18, y: 9, z: 1}
+  m_Size: {x: 18, y: 12, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
@@ -529,8 +529,8 @@ TilemapRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 54501055
+  m_SortingLayer: -1
   m_SortingOrder: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0.13999999, y: 0.13999999, z: 0}
@@ -913,6 +913,8 @@ MonoBehaviour:
   leftB: {fileID: 11400000, guid: 4d49a75c871fa5f4f915ab775d63869a, type: 2}
   teeA: {fileID: 11400000, guid: 0b114d0649ff8a9429089a8b9e18ae36, type: 2}
   teeB: {fileID: 11400000, guid: 1afb87b68db25324098066b6bf20681b, type: 2}
+  splitA: {fileID: 11400000, guid: 452c502958a13c6ce85e9144ca020cd9, type: 2}
+  splitAStatic: {fileID: 11400000, guid: bdd14e10e7f5268e2971d42de7b42b20, type: 2}
 --- !u!114 &984417577
 MonoBehaviour:
   m_ObjectHideFlags: 0

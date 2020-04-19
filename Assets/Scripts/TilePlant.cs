@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using Radmars;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -17,6 +19,9 @@ public class TilePlant : MonoBehaviour
     public TileBase leftB;
     public TileBase teeA;
     public TileBase teeB;
+
+    public AnimatedTile splitA;
+    public TileBase splitAStatic;
 
     // Growth segment state information.
     private List<Bud> buds;
@@ -57,11 +62,22 @@ public class TilePlant : MonoBehaviour
         };
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyDown("z"))
-        {
+    public void AddBud(Bud bud) {
+        buds.Add(bud);
+    }
+
+    private int x = 0;
+
+    void Update() {
+        if (Input.GetKeyDown("f")) {
+            StartTileAnimation(
+                new Vector3Int(-2, 4 + x++, 0),
+                splitA,
+                splitAStatic
+            );
+        }
+
+        if (Input.GetKeyDown("z")) {
             var newBuds = new List<Bud>();
             foreach (var bud in buds)
             {
@@ -85,27 +101,19 @@ public class TilePlant : MonoBehaviour
         foreach (var bud in budsToCheck)
         {
             bool success = bud.TryToGrow(this);
-            if (!success)
-            {
+            if (!success) {
                 died.Add(bud);
             }
         }
 
-        foreach (var dead in died)
-        {
+        foreach (var dead in died) {
             buds.Remove(dead);
         }
 
         gameObject.SendMessage("BudsMoved");
     }
 
-    public void AddBud(Bud bud)
-    {
-        buds.Add(bud);
-    }
-
-    public List<Bud> GetBuds()
-    {
+    public List<Bud> GetBuds() {
         return buds;
     }
 
@@ -116,9 +124,47 @@ public class TilePlant : MonoBehaviour
             bud.Turn(turn);
         }
     }
+    public void StartTileAnimation(Vector3Int pos, AnimatedTile animated, TileBase f) {
+        plantTilemap.SetTile(pos, animated);
+        plantTilemap.RefreshTile(pos);
+        StartCoroutine(StopTileAnimation(pos, animated, f));
+    }
 
-    public void UpdateLocation(Vector3Int location, PlantTilePhase phase, PlantTileType type, TravelDirection direction)
+    public static Vector3 ExtractPosition(Matrix4x4 matrix)
     {
+        Vector3 position;
+        position.x = matrix.m03;
+        position.y = matrix.m13;
+        position.z = matrix.m23;
+        return position;
+    }
+
+    public static Vector3 ExtractScale(Matrix4x4 matrix)
+    {
+        Vector3 scale;
+        scale.x = new Vector4(matrix.m00, matrix.m10, matrix.m20, matrix.m30).magnitude;
+        scale.y = new Vector4(matrix.m01, matrix.m11, matrix.m21, matrix.m31).magnitude;
+        scale.z = new Vector4(matrix.m02, matrix.m12, matrix.m22, matrix.m32).magnitude;
+        return scale;
+    }
+
+    private IEnumerator StopTileAnimation(Vector3Int pos, AnimatedTile animated, TileBase f) {
+        var go = new GameObject("Animation");
+        go.transform.position = plantTilemap.CellToWorld(pos) + new Vector3(.5f, .5f, 10);
+        Debug.Log(go.transform.position);
+        var renderer = go.AddComponent<SpriteRenderer>();
+
+        float t = Time.time;
+        for (var i = 0; i < animated.sprites.Length; i++) {
+            renderer.sprite = animated.sprites[i];
+            yield return new WaitForSeconds(.25f);
+        }
+        plantTilemap.SetTile(pos, f);
+        plantTilemap.RefreshTile(pos);
+        GameObject.Destroy(go);
+    }
+
+    public void UpdateLocation(Vector3Int location, PlantTilePhase phase, PlantTileType type, TravelDirection direction) {
         plantTilemap.SetTile(location, GetTile(phase, type));
         plantTilemap.SetTransformMatrix(
             location,
