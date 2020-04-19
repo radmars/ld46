@@ -843,7 +843,6 @@ GameObject:
   - component: {fileID: 984417573}
   - component: {fileID: 984417575}
   - component: {fileID: 984417576}
-  - component: {fileID: 984417578}
   - component: {fileID: 984417577}
   m_Layer: 0
   m_Name: Grid
@@ -927,15 +926,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   camera: {fileID: 74369197}
---- !u!114 &984417578
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 984417572}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9fbaca7061d93b7628ac614857981035, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
