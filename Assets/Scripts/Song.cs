@@ -23,7 +23,7 @@ public class Song : MonoBehaviour
     private IEnumerator PlaySong() {
         var start = Time.fixedUnscaledTime;
         playing = true;
-        while(Time.fixedUnscaledTime - start < 10 && playing) {
+        while(Time.fixedUnscaledTime - start < 1000 && playing) {
             yield return new WaitForSecondsRealtime(.7f);
             gameObject.SendMessage("OnBeat");
         }

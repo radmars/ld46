@@ -30,15 +30,11 @@ public class CameraChase : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         if (desiredPosition != camera.transform.position && updateStart > 0) {
-            Debug.Log("Moving camera");
-            Debug.Log(desiredPosition);
-            Debug.Log(camera.transform.position);
-            Debug.Log("Moving slerp: " + (Time.fixedTime - updateStart) / .25f);
-            camera.transform.position = Vector3.Slerp(
+            camera.SendMessage("MoveCamera", Vector3.Slerp(
                 camera.transform.position,
                 desiredPosition,
-                (Time.fixedUnscaledTime - updateStart) / .25f
-            );
+                (Time.fixedUnscaledTime - updateStart) / .65f
+            ));
         }
     }
 }
