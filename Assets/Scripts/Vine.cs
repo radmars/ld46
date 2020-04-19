@@ -10,15 +10,20 @@ public class Vine : MonoBehaviour {
     }
 
     public void OnBeat() {
-        foreach(var bud in buds) {
+        foreach (var bud in buds) {
             bud.Move();
         }
+        gameObject.SendMessage("BudsMoved");
     }
 
     public void OnTurn(TurnDirection turn) {
         foreach (var bud in buds) {
             bud.Turn(turn);
         }
+    }
+
+    public List<Bud> GetBuds() {
+        return buds;
     }
 
     public void BudDied(object bud) {
@@ -29,7 +34,7 @@ public class Vine : MonoBehaviour {
     void Update() {
         if (Input.GetKeyDown("z")) {
             var newBuds = new List<Bud>();
-            foreach(var bud in buds) {
+            foreach (var bud in buds) {
                 newBuds.Add(bud.Split(TurnDirection.Left));
             }
             buds.AddRange(newBuds);
