@@ -29,7 +29,6 @@ public class ParallaxScroller : MonoBehaviour {
             renderer.transform.position = new Vector3(x, y, 10 + index++);
             renderer.sprite = sprite;
             renderer.sortingLayerID = SortingLayer.NameToID("BG");
-            renderer.transform.localScale = new Vector3(3, 3, 1);
             
             return renderer;
         }).ToArray();
