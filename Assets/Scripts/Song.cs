@@ -5,6 +5,9 @@ public class Song : MonoBehaviour {
     bool playing = false;
 
     public AudioSource songAudioSource;
+    float lastTime = 0;
+    float start = 0;
+    float beatTime = .8f;
 
     // Start is called before the first frame update
     void Start() {
@@ -16,21 +19,28 @@ public class Song : MonoBehaviour {
     }
 
     void StartSong() {
-        songAudioSource.Play();
         StartCoroutine(PlaySong());
     }
 
     private IEnumerator PlaySong() {
-        var start = Time.fixedUnscaledTime;
+        yield return new WaitForSecondsRealtime(1.0f);
+        songAudioSource.Play();
+        start = Time.fixedUnscaledTime;
+        lastTime = start;
         playing = true;
-        while (Time.fixedUnscaledTime - start < 1000 && playing) {
-            yield return new WaitForSecondsRealtime(.8f);
-            gameObject.SendMessage("OnBeat");
-        }
     }
 
     // Update is called once per frame
     void Update() {
+        float timeDiff = Time.fixedUnscaledTime - lastTime;
+        // lil bit of fudge factor to allow for frames that land just before the beat
+        if (playing && timeDiff > (beatTime - 0.015))
+        {
+            lastTime = Time.fixedUnscaledTime - (timeDiff - beatTime);
+            float timeSinceStart = Time.fixedUnscaledTime - start;
+            gameObject.SendMessage("OnBeat");
+        }
+
         if (Input.GetKeyDown("a")) {
             gameObject.SendMessage("OnTurn", TurnDirection.Left);
         }
