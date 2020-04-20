@@ -415,7 +415,7 @@ Sprite:
         format: 0
         dimension: 0
       m_DataSize: 80
-      _typelessdata: 000000bf0000003f000000000000003f0000003f00000000000000bf000000bf000000000000003f000000bf000000000000000000000000000000000000000000000000000000000000000000000000
+      _typelessdata: 000000bf0000003f000000000000003f0000003f00000000000000bf000000bf000000000000003f000000bf00000000000000000000803f0000803f0000803f00000000000000000000803f00000000
     m_Bindpose: []
     textureRect:
       serializedVersion: 2
@@ -1120,14 +1120,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   budA: {fileID: 11400000, guid: 6551162dfff88b79da5c4426040e2d63, type: 2}
   budB: {fileID: 11400000, guid: 0069ffdb0a477943289f60b7d7450c4f, type: 2}
-  straightA: {fileID: 0}
-  straightB: {fileID: 0}
-  rightA: {fileID: 0}
-  rightB: {fileID: 0}
-  leftA: {fileID: 0}
-  leftB: {fileID: 0}
-  teeA: {fileID: 0}
-  teeB: {fileID: 0}
+  straightA: {fileID: 11400000, guid: 12f8bc601e90070f3905e07e2164f9c3, type: 2}
+  straightB: {fileID: 11400000, guid: 3fbc6c4a379b9460caab47335dd29229, type: 2}
+  rightA: {fileID: 11400000, guid: 2f90f54f34d2f2beebf247bed4f41a39, type: 2}
+  rightB: {fileID: 11400000, guid: 93eb8d5e3ea8c1f1dba5a00c4d7ff7c4, type: 2}
+  leftA: {fileID: 11400000, guid: af35be08a1c58c640834b9047537761a, type: 2}
+  leftB: {fileID: 11400000, guid: 9a6e9ce04f99794a78488097c2a57d93, type: 2}
+  teeA: {fileID: 11400000, guid: c9bc6cdacafd41643ad939174ad28605, type: 2}
+  teeB: {fileID: 11400000, guid: 452c502958a13c6ce85e9144ca020cd9, type: 2}
   hitAudioSource: {fileID: 984417581}
   hitLowAudioSource: {fileID: 984417580}
   branchAudioSource: {fileID: 984417579}
