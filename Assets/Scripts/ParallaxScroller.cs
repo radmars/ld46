@@ -2,7 +2,7 @@
 using UnityEngine;
 
 public class ParallaxScroller : MonoBehaviour {
-    private float layerRatio = .05f;
+    private float layerRatio = .1f;
     public Sprite[] sprites;
     private SpriteRenderer[] children;
 
