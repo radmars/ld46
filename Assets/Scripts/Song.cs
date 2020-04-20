@@ -14,6 +14,8 @@ public class Song : MonoBehaviour {
     float endTimeSeconds = 345.6f;
     float winTimeSeconds = 361.0f;
 
+    float gameOverTime = 9.0f;
+
     SpriteRenderer fadeOverlay;
 
     // Start is called before the first frame update
@@ -42,6 +44,12 @@ public class Song : MonoBehaviour {
         playing = false;
         songAudioSource.Stop();
         gameOverAudioSource.Play();
+        StartCoroutine(BackToSplash());
+    }
+
+    private IEnumerator BackToSplash() {
+        yield return new WaitForSecondsRealtime(gameOverTime);
+        UnityEngine.SceneManagement.SceneManager.LoadScene("splash-menu");
     }
 
     // Update is called once per frame
