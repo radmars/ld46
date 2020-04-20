@@ -139,12 +139,12 @@ public class Bud {
         }
     }
 
-    // Phase swaps on straight segments, but outputs of turns and T-junctions are always phase B.
+    // Phase swaps on straight segments, but outputs of turns and T-junctions are always phase A???
     private PlantTilePhase GetNewPhase() {
         if (nextType == PlantTileType.Straight) {
             return phase == PlantTilePhase.A ? PlantTilePhase.B : PlantTilePhase.A;
         }
-        return PlantTilePhase.B;
+        return PlantTilePhase.A;
     }
 
     private Vector3Int Travel(TravelDirection direction) {
