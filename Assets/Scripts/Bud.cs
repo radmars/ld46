@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Tilemaps;
 
 public class Bud {
     /// I'm too lazy to just do this with vector shit and rotations.
@@ -49,22 +48,24 @@ public class Bud {
             return true;
         }
         // Next, plant self-collisions...
-        if (plant.tilemap.GetTile(location) != null)
+        if (plant.plantTilemap.GetTile(location) != null)
         {
             plant.hitAudioSource.Play();
             return true;
         }
 
         // Finally, stage collisions.
-        var collision = plant.stage.TileAt(location);
-        switch (collision)
+        var tile = plant.stageTilemap.GetTile(location);
+        if (!tile)
         {
-            case StageTile.Blank:
-                return false;
-            case StageTile.Spike:
+            return false;
+        }
+        switch (tile.name)
+        {
+            case "spike":
                 plant.hitAudioSource.Play();
                 return true;
-            case StageTile.Splitter:
+            case "splitter":
                 plant.branchAudioSource.Play();
                 plant.AddBud(Split());
                 return false;

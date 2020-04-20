@@ -843,7 +843,6 @@ GameObject:
   - component: {fileID: 984417573}
   - component: {fileID: 984417575}
   - component: {fileID: 984417576}
-  - component: {fileID: 984417578}
   - component: {fileID: 984417577}
   - component: {fileID: 984417581}
   - component: {fileID: 984417580}
@@ -919,6 +918,8 @@ MonoBehaviour:
   leftB: {fileID: 11400000, guid: 4d49a75c871fa5f4f915ab775d63869a, type: 2}
   teeA: {fileID: 11400000, guid: 0b114d0649ff8a9429089a8b9e18ae36, type: 2}
   teeB: {fileID: 11400000, guid: 1afb87b68db25324098066b6bf20681b, type: 2}
+  splitA: {fileID: 0}
+  splitAStatic: {fileID: 0}
   hitAudioSource: {fileID: 984417581}
   hitLowAudioSource: {fileID: 984417580}
   branchAudioSource: {fileID: 984417579}
@@ -935,18 +936,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   camera: {fileID: 74369197}
---- !u!114 &984417578
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 984417572}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9fbaca7061d93b7628ac614857981035, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!82 &984417579
 AudioSource:
   m_ObjectHideFlags: 0
