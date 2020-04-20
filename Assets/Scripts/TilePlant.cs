@@ -18,10 +18,6 @@ public class TilePlant : MonoBehaviour {
     public TileBase leftB;
     public TileBase teeA;
     public TileBase teeB;
-
-    public AnimatedTile splitA;
-    public TileBase splitAStatic;
-
     // Growth segment state information.
     private List<Bud> buds;
     private Grid grid;
@@ -68,16 +64,7 @@ public class TilePlant : MonoBehaviour {
         buds.Add(bud);
     }
 
-    private int x = 0;
-
     void Update() {
-        if (Input.GetKeyDown("f")) {
-            StartTileAnimation(
-                new Vector3Int(-2, 4 + x++, 0),
-                splitA
-            );
-        }
-
         if (Input.GetKeyDown("z")) {
             var newBuds = new List<Bud>();
             foreach (var bud in buds) {
