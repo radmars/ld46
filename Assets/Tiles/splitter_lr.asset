@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: splitter
+  m_Name: splitter_lr
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 21300000, guid: 56871e6477222ae4dbab6ab749ef4be0, type: 3}
+  m_Sprite: {fileID: 2552753922096773421, guid: f4e4ce54c5eb6284199733cd55ece9d6,
+    type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1

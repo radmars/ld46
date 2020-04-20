@@ -64,16 +64,6 @@ public class TilePlant : MonoBehaviour {
         buds.Add(bud);
     }
 
-    void Update() {
-        if (Input.GetKeyDown("z")) {
-            var newBuds = new List<Bud>();
-            foreach (var bud in buds) {
-                newBuds.Add(bud.Split());
-            }
-            buds.AddRange(newBuds);
-        }
-    }
-
     private TileBase GetTile(PlantTilePhase phase, PlantTileType type) {
         return tileLookup[phase][type];
     }

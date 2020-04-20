@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class Bud {
     /// I'm too lazy to just do this with vector shit and rotations.
@@ -10,32 +11,52 @@ public class Bud {
 
     public Vector3Int location;
 
+    private Stack<TravelDirection> pendingSplit = new Stack<TravelDirection>();
+
     // Attempt to grow this bud, taking into account possible collisions with the bounding box,
     // existing plants, and the stage. Returns true if the growth was successful, false if the
-    // bud died attempting to grow.
+    // bud died after growing.
     public bool TryToGrow(TilePlant plant) {
-        var newHeading = GetNewHeading(nextType);
+        TravelDirection newHeading = pendingSplit.Count > 0 ? pendingSplit.Pop() : GetNewHeading(nextType);
+
         var newLocation = Travel(newHeading);
         var newPhase = GetNewPhase();
 
         plant.UpdateLocation(location, phase, nextType, travel);
-        if (CheckIfDied(plant, newLocation))
+        while (pendingSplit.Count > 0)
+        {
+            var splitDirection = pendingSplit.Pop();
+            var splitLocation = location + GetDirectionVector(splitDirection);
+
+            if (!FatalLocation(plant, splitLocation, false)) {
+                plant.AddBud(new Bud
+                {
+                    location = splitLocation,
+                    travel = splitDirection,
+                });
+                plant.UpdateLocation(splitLocation, newPhase, PlantTileType.Bud, splitDirection);
+            }
+        }
+
+        nextType = PlantTileType.Straight; // May be overridden by CheckCollisions.
+        if (FatalLocation(plant, newLocation, true))
         {
             return false;
         }
+        CheckForSplitter(plant, newLocation);
 
         plant.UpdateLocation(newLocation, newPhase, PlantTileType.Bud, newHeading);
 
         location = newLocation;
         travel = newHeading;
         phase = newPhase;
-        nextType = PlantTileType.Straight;
 
         return true;
     }
 
-    // Returns true if the bud died as the result of a collision.
-    private bool CheckIfDied(TilePlant plant, Vector3Int location)
+    // Returns true if the specified location will kill buds. If playSound is true, will play an
+    // appropriate sound for the poor, poor plant.
+    private bool FatalLocation(TilePlant plant, Vector3Int location, bool playSound)
     {
         // First, worry about the world boundaries...
         if (
@@ -44,34 +65,77 @@ public class Bud {
             || location.y < StageConstants.bottomLimit
             )
         {
-            plant.hitLowAudioSource.Play();
+            if (playSound)
+            {
+                plant.hitLowAudioSource.Play();
+            }
             return true;
         }
         // Next, plant self-collisions...
         if (plant.plantTilemap.GetTile(location) != null)
         {
-            plant.hitAudioSource.Play();
+            if (playSound)
+            {
+                plant.hitAudioSource.Play();
+            }
             return true;
         }
 
         // Finally, stage collisions.
         var tile = plant.stageTilemap.GetTile(location);
-        if (!tile)
+        if (!tile || tile.name != "spike")
         {
             return false;
         }
+        // tile.name == "spike"
+        if (playSound)
+        {
+            plant.hitAudioSource.Play();
+        }
+        return true;
+    }
+
+    private void CheckForSplitter(TilePlant plant, Vector3Int location)
+    {
+        var tile = plant.stageTilemap.GetTile(location);
+        if (!tile)
+        {
+            return;
+        }
+        if (tile.name.StartsWith("splitter_"))
+        {
+            plant.branchAudioSource.Play();
+            nextType = PlantTileType.Tee;
+        }
         switch (tile.name)
         {
-            case "spike":
-                plant.hitAudioSource.Play();
-                return true;
-            case "splitter":
-                plant.branchAudioSource.Play();
-                plant.AddBud(Split());
-                return false;
+            case "splitter_dr":
+                pendingSplit.Push(TravelDirection.Down);
+                pendingSplit.Push(TravelDirection.Right);
+                return;
+            case "splitter_ld":
+                pendingSplit.Push(TravelDirection.Left);
+                pendingSplit.Push(TravelDirection.Down);
+                return;
+            case "splitter_lr":
+                pendingSplit.Push(TravelDirection.Left);
+                pendingSplit.Push(TravelDirection.Right);
+                return;
+            case "splitter_lu":
+                pendingSplit.Push(TravelDirection.Left);
+                pendingSplit.Push(TravelDirection.Up);
+                return;
+            case "splitter_ud":
+                pendingSplit.Push(TravelDirection.Up);
+                pendingSplit.Push(TravelDirection.Down);
+                return;
+            case "splitter_ur":
+                pendingSplit.Push(TravelDirection.Up);
+                pendingSplit.Push(TravelDirection.Right);
+                return;
             default:
                 Debug.LogError("Missing collision case");
-                return false;
+                return;
         }
     }
 
@@ -121,6 +185,11 @@ public class Bud {
     }
 
     public void Turn(TurnDirection turn) {
+        // If there's a pending split, the player has no control over this bud.
+        if (pendingSplit.Count > 0)
+        {
+            return;
+        }
         this.nextType = GetNextType(turn);
     }
 
@@ -141,17 +210,6 @@ public class Bud {
                         return PlantTileType.Straight;
                 }
         }
-    }
-
-    // Split a new bud to the left. "This" one will go right.
-    public Bud Split() {
-        var bud = new Bud();
-        var direction = GetTurnDirection(TurnDirection.Left);
-        this.Turn(TurnDirection.Right);
-        bud.location = GetDirectionVector(direction) + location;
-        bud.SetDirection(direction);
-        nextType = PlantTileType.Tee;
-        return bud;
     }
 
     /// Figure out what the direction we'd be facing if we turned the given direction.
