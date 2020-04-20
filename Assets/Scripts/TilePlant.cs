@@ -4,8 +4,7 @@ using Radmars;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class TilePlant : MonoBehaviour
-{
+public class TilePlant : MonoBehaviour {
     // I feel like there's got to be a better way to bulk set or retrieve these values. Also, this
     // is going to get _interesting_ when we try to add animations. Additionally, straightA and
     // straightB are currently reversed, so either the labels are wrong or the implementation is.
@@ -32,8 +31,7 @@ public class TilePlant : MonoBehaviour
     private Dictionary<PlantTilePhase, Dictionary<PlantTileType, TileBase>> tileLookup;
 
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
         buds = new List<Bud>();
         buds.Add(new Bud());
 
@@ -72,34 +70,29 @@ public class TilePlant : MonoBehaviour
         if (Input.GetKeyDown("f")) {
             StartTileAnimation(
                 new Vector3Int(-2, 4 + x++, 0),
-                splitA,
-                splitAStatic
+                splitA
             );
         }
 
         if (Input.GetKeyDown("z")) {
             var newBuds = new List<Bud>();
-            foreach (var bud in buds)
-            {
+            foreach (var bud in buds) {
                 newBuds.Add(bud.Split());
             }
             buds.AddRange(newBuds);
         }
     }
 
-    private TileBase GetTile(PlantTilePhase phase, PlantTileType type)
-    {
+    private TileBase GetTile(PlantTilePhase phase, PlantTileType type) {
         return tileLookup[phase][type];
     }
 
     // Methods that receive from invocations of "SendMessage"
-    public void OnBeat()
-    {
+    public void OnBeat() {
         var died = new List<Bud>();
         var budsToCheck = new List<Bud>(buds);
 
-        foreach (var bud in budsToCheck)
-        {
+        foreach (var bud in budsToCheck) {
             bool success = bud.TryToGrow(this);
             if (!success) {
                 died.Add(bud);
@@ -117,60 +110,61 @@ public class TilePlant : MonoBehaviour
         return buds;
     }
 
-    public void OnTurn(TurnDirection turn)
-    {
-        foreach (var bud in buds)
-        {
+    public void OnTurn(TurnDirection turn) {
+        foreach (var bud in buds) {
             bud.Turn(turn);
         }
     }
-    public void StartTileAnimation(Vector3Int pos, AnimatedTile animated, TileBase f) {
-        plantTilemap.SetTile(pos, animated);
-        plantTilemap.RefreshTile(pos);
-        StartCoroutine(StopTileAnimation(pos, animated, f));
-    }
 
-    public static Vector3 ExtractPosition(Matrix4x4 matrix)
-    {
-        Vector3 position;
-        position.x = matrix.m03;
-        position.y = matrix.m13;
-        position.z = matrix.m23;
-        return position;
-    }
-
-    public static Vector3 ExtractScale(Matrix4x4 matrix)
-    {
-        Vector3 scale;
-        scale.x = new Vector4(matrix.m00, matrix.m10, matrix.m20, matrix.m30).magnitude;
-        scale.y = new Vector4(matrix.m01, matrix.m11, matrix.m21, matrix.m31).magnitude;
-        scale.z = new Vector4(matrix.m02, matrix.m12, matrix.m22, matrix.m32).magnitude;
-        return scale;
-    }
-
-    private IEnumerator StopTileAnimation(Vector3Int pos, AnimatedTile animated, TileBase f) {
+    private IEnumerator PlayTileAnimation(AnimatedTile tile, Vector3Int pos) {
         var go = new GameObject("Animation");
-        go.transform.position = plantTilemap.CellToWorld(pos) + new Vector3(.5f, .5f, 10);
-        Debug.Log(go.transform.position);
         var renderer = go.AddComponent<SpriteRenderer>();
+        go.transform.position = plantTilemap.CellToWorld(pos) + new Vector3(.5f, .5f, 10);
+        go.transform.rotation = ExtractRotation(plantTilemap.GetTransformMatrix(pos));
 
         float t = Time.time;
-        for (var i = 0; i < animated.sprites.Length; i++) {
-            renderer.sprite = animated.sprites[i];
-            yield return new WaitForSeconds(.25f);
+        for (var i = 0; i < tile.sprites.Length; i++) {
+            renderer.sprite = tile.sprites[i];
+            yield return new WaitForSeconds(tile.duration / tile.sprites.Length);
         }
-        plantTilemap.SetTile(pos, f);
+        plantTilemap.SetTile(pos, tile.final);
         plantTilemap.RefreshTile(pos);
         GameObject.Destroy(go);
     }
 
+    private static Quaternion ExtractRotation(Matrix4x4 matrix) {
+        Vector3 forward;
+        forward.x = matrix.m02;
+        forward.y = matrix.m12;
+        forward.z = matrix.m22;
+
+        Vector3 upwards;
+        upwards.x = matrix.m01;
+        upwards.y = matrix.m11;
+        upwards.z = matrix.m21;
+
+        return Quaternion.LookRotation(forward, upwards);
+    }
+
+    public void StartTileAnimation(Vector3Int pos, AnimatedTile tile) {
+        plantTilemap.SetTile(pos, tile);
+        plantTilemap.RefreshTile(pos);
+        StartCoroutine(PlayTileAnimation(tile, pos));
+    }
+
     public void UpdateLocation(Vector3Int location, PlantTilePhase phase, PlantTileType type, TravelDirection direction) {
-        plantTilemap.SetTile(location, GetTile(phase, type));
+        var tile = GetTile(phase, type);
         plantTilemap.SetTransformMatrix(
             location,
             Matrix4x4.Rotate(
-                Quaternion.Euler(0, 0, (int)direction)
+                Quaternion.Euler(0, 0, (int) direction)
             )
         );
+
+        if (tile is AnimatedTile) {
+            StartTileAnimation(location, (AnimatedTile) tile);
+        } else {
+            plantTilemap.SetTile(location, tile);
+        }
     }
 }

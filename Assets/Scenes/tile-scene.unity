@@ -911,7 +911,7 @@ MonoBehaviour:
   rightB: {fileID: 11400000, guid: d778904d0620c5c40b829f52d8e58f84, type: 2}
   leftA: {fileID: 11400000, guid: e13f1d58fa5ba284c89ead44371033b7, type: 2}
   leftB: {fileID: 11400000, guid: 4d49a75c871fa5f4f915ab775d63869a, type: 2}
-  teeA: {fileID: 11400000, guid: 0b114d0649ff8a9429089a8b9e18ae36, type: 2}
+  teeA: {fileID: 11400000, guid: 452c502958a13c6ce85e9144ca020cd9, type: 2}
   teeB: {fileID: 11400000, guid: 1afb87b68db25324098066b6bf20681b, type: 2}
   splitA: {fileID: 11400000, guid: 452c502958a13c6ce85e9144ca020cd9, type: 2}
   splitAStatic: {fileID: 11400000, guid: bdd14e10e7f5268e2971d42de7b42b20, type: 2}

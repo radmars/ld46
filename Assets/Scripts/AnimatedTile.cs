@@ -10,30 +10,17 @@ namespace Radmars {
     [Serializable]
     [CreateAssetMenu(fileName = "RAD TILE", menuName = "RAD TILE")]
     public class AnimatedTile : TileBase {
+        public Sprite visible;
+        public TileBase final;
         public Sprite[] sprites;
-        public Sprite current;
-        public float speed = 4;
+        public float duration = 4;
 
         public override void GetTileData(Vector3Int location, ITilemap tileMap, ref TileData tileData) {
             tileData.transform = Matrix4x4.identity;
             tileData.color = Color.white;
             tileData.colliderType = Tile.ColliderType.Sprite;
-            if(current != null) {
-                tileData.sprite = current;
-            }
-            else {
-                tileData.sprite = sprites[0];
-            }
+            tileData.sprite = visible;
         }
-
-/*
-        public override bool GetTileAnimationData(Vector3Int location, ITilemap tileMap, ref TileAnimationData tileAnimationData) {
-            tileAnimationData.animatedSprites = sprites;
-            tileAnimationData.animationSpeed = speed;
-            tileAnimationData.animationStartTime = 0;
-            return true;
-        }
-*/
     }
 
 #if UNITY_EDITOR
@@ -43,16 +30,22 @@ namespace Radmars {
 
         public override void OnInspectorGUI() {
             EditorGUI.BeginChangeCheck();
-            float speed = EditorGUILayout.FloatField("Animation Speed", tile.speed);
-            if (speed < 0.0f)
-                speed = 0.0f;
+            float duration = EditorGUILayout.FloatField("Animation duration in seconds", tile.duration);
+            if (duration < 0.0f)
+                duration = 0.0f;
 
-            tile.speed = speed;
+            tile.duration = duration;
 
             int count = EditorGUILayout.DelayedIntField("Number of frames", tile.sprites != null ? tile.sprites.Length : 0);
             if (count < 0) {
                 count = 0;
             }
+
+            EditorGUILayout.Space();
+            tile.visible = (Sprite) EditorGUILayout.ObjectField("Visible sprite", tile.visible, typeof(Sprite), false, null);
+
+            EditorGUILayout.Space();
+            tile.final = (TileBase) EditorGUILayout.ObjectField("Final sprite", tile.final, typeof(TileBase), false, null);
 
             if (tile.sprites == null || tile.sprites.Length != count) {
                 Array.Resize<Sprite>(ref tile.sprites, count);
