@@ -45,11 +45,13 @@ public class Bud {
             || location.y < StageConstants.bottomLimit
             )
         {
+            plant.hitLowAudioSource.Play();
             return true;
         }
         // Next, plant self-collisions...
         if (plant.tilemap.GetTile(location) != null)
         {
+            plant.hitAudioSource.Play();
             return true;
         }
 
@@ -60,8 +62,10 @@ public class Bud {
             case StageTile.Blank:
                 return false;
             case StageTile.Spike:
+                plant.hitAudioSource.Play();
                 return true;
             case StageTile.Splitter:
+                plant.branchAudioSource.Play();
                 plant.AddBud(Split());
                 return false;
             default:

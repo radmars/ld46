@@ -4,6 +4,8 @@ using UnityEngine;
 public class Song : MonoBehaviour {
     bool playing = false;
 
+    public AudioSource songAudioSource;
+
     // Start is called before the first frame update
     void Start() {
         StartSong();
@@ -14,6 +16,7 @@ public class Song : MonoBehaviour {
     }
 
     void StartSong() {
+        songAudioSource.Play();
         StartCoroutine(PlaySong());
     }
 
@@ -21,7 +24,7 @@ public class Song : MonoBehaviour {
         var start = Time.fixedUnscaledTime;
         playing = true;
         while (Time.fixedUnscaledTime - start < 1000 && playing) {
-            yield return new WaitForSecondsRealtime(.7f);
+            yield return new WaitForSecondsRealtime(.8f);
             gameObject.SendMessage("OnBeat");
         }
     }

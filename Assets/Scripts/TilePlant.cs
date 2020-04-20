@@ -25,6 +25,10 @@ public class TilePlant : MonoBehaviour {
     internal TileStage stage { get; private set; }
     private Dictionary<PlantTilePhase, Dictionary<PlantTileType, TileBase>> tileLookup;
 
+    public AudioSource hitAudioSource;
+    public AudioSource hitLowAudioSource;
+    public AudioSource branchAudioSource;
+
     // Start is called before the first frame update
     void Start() {
         buds = new List<Bud>();
