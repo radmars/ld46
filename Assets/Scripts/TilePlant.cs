@@ -93,6 +93,10 @@ public class TilePlant : MonoBehaviour {
             buds.Remove(dead);
         }
 
+        if (buds.Count == 0) {
+            gameObject.SendMessage("TriggerGameOver");
+        }
+
         gameObject.SendMessage("BudsMoved");
     }
 

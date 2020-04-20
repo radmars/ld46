@@ -5,6 +5,7 @@ public class Song : MonoBehaviour {
     bool playing = false;
 
     public AudioSource songAudioSource;
+    public AudioSource gameOverAudioSource;
     float lastTime = 0;
     float start = 0;
     float beatTime = .8f;
@@ -12,10 +13,6 @@ public class Song : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
         StartSong();
-    }
-
-    void StopSong() {
-        playing = false;
     }
 
     void StartSong() {
@@ -28,6 +25,12 @@ public class Song : MonoBehaviour {
         start = Time.fixedUnscaledTime;
         lastTime = start;
         playing = true;
+    }
+
+    void TriggerGameOver() {
+        playing = false;
+        songAudioSource.Stop();
+        gameOverAudioSource.Play();
     }
 
     // Update is called once per frame
