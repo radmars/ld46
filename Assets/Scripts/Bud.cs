@@ -11,71 +11,92 @@ public class Bud {
 
     public Vector3Int location;
 
-    private Stack<TravelDirection> pendingSplit = new Stack<TravelDirection>();
+    class Split {
+        public TravelDirection split1;
+        public TravelDirection split2;
+        public TravelDirection rotation;
+        public PlantTileType type;
+
+        public Split(TravelDirection split1, TravelDirection split2, TravelDirection rotation, PlantTileType type) {
+            this.split1 = split1;
+            this.split2 = split2;
+            this.rotation = rotation;
+            this.type = type;
+        }
+    }
+
+    private Split pendingSplit;
 
     // Attempt to grow this bud, taking into account possible collisions with the bounding box,
     // existing plants, and the stage. Returns true if the growth was successful, false if the
     // bud died after growing.
     public bool TryToGrow(TilePlant plant) {
-        TravelDirection newHeading = pendingSplit.Count > 0 ? pendingSplit.Pop() : GetNewHeading(nextType);
+        // If we split, hijack this update to show the new split tile.
+        if(pendingSplit != null) {
+            nextType = pendingSplit.type;
+            travel = pendingSplit.rotation;
+            Debug.Log(nextType);
+            Debug.Log(travel);
+        }
+        plant.UpdateLocation(location, phase, nextType, travel);
 
+        var newHeading = GetNewHeading(nextType);
         var newLocation = Travel(newHeading);
         var newPhase = GetNewPhase();
 
-        plant.UpdateLocation(location, phase, nextType, travel);
-        while (pendingSplit.Count > 0)
-        {
-            var splitDirection = pendingSplit.Pop();
+        // If we split, try to grow split1, replace heading for the main bud.
+        if (pendingSplit != null) {
+            var splitDirection = pendingSplit.split1;
             var splitLocation = location + GetDirectionVector(splitDirection);
 
             if (!FatalLocation(plant, splitLocation, false)) {
-                plant.AddBud(new Bud
-                {
+                plant.AddBud(new Bud {
                     location = splitLocation,
                     travel = splitDirection,
+                    phase = newPhase,
                 });
                 plant.UpdateLocation(splitLocation, newPhase, PlantTileType.Bud, splitDirection);
             }
+
+            newHeading = pendingSplit.split2;
+            newLocation = Travel(newHeading);
+            pendingSplit = null;
         }
 
         nextType = PlantTileType.Straight; // May be overridden by CheckCollisions.
-        if (FatalLocation(plant, newLocation, true))
-        {
+        if (FatalLocation(plant, newLocation, true)) {
             return false;
         }
-        CheckForSplitter(plant, newLocation);
 
-        plant.UpdateLocation(newLocation, newPhase, PlantTileType.Bud, newHeading);
-
+        // Needed for checking splitter rotations.
         location = newLocation;
         travel = newHeading;
         phase = newPhase;
+
+        CheckForSplitter(plant, newLocation);
+
+        plant.UpdateLocation(newLocation, newPhase, PlantTileType.Bud, newHeading);
 
         return true;
     }
 
     // Returns true if the specified location will kill buds. If playSound is true, will play an
     // appropriate sound for the poor, poor plant.
-    private bool FatalLocation(TilePlant plant, Vector3Int location, bool playSound)
-    {
+    private bool FatalLocation(TilePlant plant, Vector3Int location, bool playSound) {
         // First, worry about the world boundaries...
         if (
-            location.x < StageConstants.leftLimit
-            || location.x > StageConstants.rightLimit
-            || location.y < StageConstants.bottomLimit
-            )
-        {
-            if (playSound)
-            {
+            location.x < StageConstants.leftLimit ||
+            location.x > StageConstants.rightLimit ||
+            location.y < StageConstants.bottomLimit
+        ) {
+            if (playSound) {
                 plant.hitLowAudioSource.Play();
             }
             return true;
         }
         // Next, plant self-collisions...
-        if (plant.plantTilemap.GetTile(location) != null)
-        {
-            if (playSound)
-            {
+        if (plant.plantTilemap.GetTile(location) != null) {
+            if (playSound) {
                 plant.hitAudioSource.Play();
             }
             return true;
@@ -83,60 +104,78 @@ public class Bud {
 
         // Finally, stage collisions.
         var tile = plant.stageTilemap.GetTile(location);
-        if (!tile || tile.name != "spike")
-        {
+        if (!tile || tile.name != "spike") {
             return false;
         }
         // tile.name == "spike"
-        if (playSound)
-        {
+        if (playSound) {
             plant.hitAudioSource.Play();
         }
         return true;
     }
 
-    private void CheckForSplitter(TilePlant plant, Vector3Int location)
-    {
-        var tile = plant.stageTilemap.GetTile(location);
-        if (!tile)
-        {
-            return;
+    private Split GetSplit(string splitter, TravelDirection incoming) {
+        switch (incoming) {
+            case TravelDirection.Up:
+                switch (splitter) {
+                    case "splitter_lr":
+                        return new Split(TravelDirection.Left, TravelDirection.Right, TravelDirection.Up, PlantTileType.Tee);
+                    case "splitter_lu":
+                        return new Split(TravelDirection.Left, TravelDirection.Up, TravelDirection.Right, PlantTileType.Tee);
+                        // case "splitter_ur":
+                    default:
+                        return new Split(TravelDirection.Up, TravelDirection.Right, TravelDirection.Left, PlantTileType.Tee);
+                }
+            case TravelDirection.Down:
+                switch (splitter) {
+                    case "splitter_lr":
+                        return new Split(TravelDirection.Left, TravelDirection.Right, TravelDirection.Down, PlantTileType.Tee);
+                    case "splitter_lu":
+                        return new Split(TravelDirection.Left, TravelDirection.Up, TravelDirection.Down, PlantTileType.Right);
+                    // case "splitter_ur":
+                    default:
+                        return new Split(TravelDirection.Up, TravelDirection.Right, TravelDirection.Down, PlantTileType.Left);
+                }
+            case TravelDirection.Left:
+                switch (splitter) {
+                    case "splitter_lr":
+                        return new Split(TravelDirection.Left, TravelDirection.Right, TravelDirection.Left, PlantTileType.Straight);
+                    case "splitter_lu":
+                        return new Split(TravelDirection.Left, TravelDirection.Up, TravelDirection.Down, PlantTileType.Tee);
+                        // case "splitter_ur":
+                    default:
+                        return new Split(TravelDirection.Up, TravelDirection.Right, TravelDirection.Left, PlantTileType.Right);
+                }
+            default:
+                switch (splitter) {
+                    case "splitter_lr":
+                        Debug.Log("Test3");
+                        return new Split(TravelDirection.Left, TravelDirection.Right, TravelDirection.Right, PlantTileType.Straight);
+                    case "splitter_lu":
+                        Debug.Log("TEST");
+                        return new Split(TravelDirection.Left, TravelDirection.Up, TravelDirection.Right, PlantTileType.Left);
+                        // case "splitter_ur":
+                    default:
+                        Debug.Log("TEST2");
+                        return new Split(TravelDirection.Up, TravelDirection.Right, TravelDirection.Down, PlantTileType.Tee);
+                }
         }
-        if (tile.name.StartsWith("splitter_"))
-        {
+    }
+
+    private bool CheckForSplitter(TilePlant plant, Vector3Int location) {
+        var tile = plant.stageTilemap.GetTile(location);
+        if (!tile) {
+            return false;
+        }
+
+        if (tile.name.StartsWith("splitter_")) {
             plant.branchAudioSource.Play();
             nextType = PlantTileType.Tee;
+            Debug.Log("Traveling: " + travel);
+            pendingSplit = GetSplit(tile.name, travel);
+            return true;
         }
-        switch (tile.name)
-        {
-            case "splitter_dr":
-                pendingSplit.Push(TravelDirection.Down);
-                pendingSplit.Push(TravelDirection.Right);
-                return;
-            case "splitter_ld":
-                pendingSplit.Push(TravelDirection.Left);
-                pendingSplit.Push(TravelDirection.Down);
-                return;
-            case "splitter_lr":
-                pendingSplit.Push(TravelDirection.Left);
-                pendingSplit.Push(TravelDirection.Right);
-                return;
-            case "splitter_lu":
-                pendingSplit.Push(TravelDirection.Left);
-                pendingSplit.Push(TravelDirection.Up);
-                return;
-            case "splitter_ud":
-                pendingSplit.Push(TravelDirection.Up);
-                pendingSplit.Push(TravelDirection.Down);
-                return;
-            case "splitter_ur":
-                pendingSplit.Push(TravelDirection.Up);
-                pendingSplit.Push(TravelDirection.Right);
-                return;
-            default:
-                Debug.LogError("Missing collision case");
-                return;
-        }
+        return false;
     }
 
     // Phase swaps on straight segments, but outputs of turns and T-junctions are always phase A???
@@ -174,7 +213,7 @@ public class Bud {
                 return Vector3Int.up * -1;
             case TravelDirection.Left:
                 return Vector3Int.right * -1;
-            // case TravelDirection.Right:
+                // case TravelDirection.Right:
             default:
                 return Vector3Int.right;
         }
@@ -186,8 +225,7 @@ public class Bud {
 
     public void Turn(TurnDirection turn) {
         // If there's a pending split, the player has no control over this bud.
-        if (pendingSplit.Count > 0)
-        {
+        if (pendingSplit != null) {
             return;
         }
         this.nextType = GetNextType(turn);
@@ -219,15 +257,15 @@ public class Bud {
                 switch (dir) {
                     case TurnDirection.Left:
                         return TravelDirection.Left;
-                    // case TurnDirection.Right:
-                    default: 
+                        // case TurnDirection.Right:
+                    default:
                         return TravelDirection.Right;
                 }
             case TravelDirection.Left:
                 switch (dir) {
                     case TurnDirection.Left:
                         return TravelDirection.Down;
-                    // case TurnDirection.Right:
+                        // case TurnDirection.Right:
                     default:
                         return TravelDirection.Up;
                 }
@@ -235,16 +273,16 @@ public class Bud {
                 switch (dir) {
                     case TurnDirection.Left:
                         return TravelDirection.Right;
-                    // case TurnDirection.Right:
+                        // case TurnDirection.Right:
                     default:
                         return TravelDirection.Left;
                 }
-            // case TravelDirection.Right:
+                // case TravelDirection.Right:
             default:
                 switch (dir) {
                     case TurnDirection.Left:
                         return TravelDirection.Up;
-                    // case TurnDirection.Right:
+                        // case TurnDirection.Right:
                     default:
                         return TravelDirection.Down;
                 }
