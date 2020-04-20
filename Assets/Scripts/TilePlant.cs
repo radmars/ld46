@@ -78,7 +78,6 @@ public class TilePlant : MonoBehaviour {
         return tileLookup[phase][type];
     }
 
-    // Methods that receive from invocations of "SendMessage"
     public void OnBeat() {
         var died = new List<Bud>();
         var budsToCheck = new List<Bud>(buds);
