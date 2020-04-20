@@ -7,7 +7,7 @@ public class Bud {
 
     private PlantTileType nextType = PlantTileType.Straight;
 
-    private PlantTilePhase phase = PlantTilePhase.A;
+    private PlantTilePhase phase = PlantTilePhase.B;
 
     public Vector3Int location;
 

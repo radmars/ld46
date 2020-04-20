@@ -13,6 +13,7 @@ public class CameraChase : MonoBehaviour {
     void Start() {
         vine = GetComponent<TilePlant>();
         startingHeight = camera.transform.position.y;
+        camera.SendMessage("MoveCamera", camera.transform.position);
     }
 
     public void BudsMoved() {
@@ -20,7 +21,7 @@ public class CameraChase : MonoBehaviour {
         if(buds.Count > 0) {
             desiredPosition = new Vector3();
             foreach (var bud in buds) {
-                desiredPosition += new Vector3(bud.location.x, bud.location.y, 0) / (float)buds.Count;
+                desiredPosition += new Vector3(bud.location.x + 0.5f, bud.location.y, 0) / (float)buds.Count;
             }
 
             desiredPosition = new Vector3(
