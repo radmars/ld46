@@ -8,6 +8,7 @@ public class ParallaxScroller : MonoBehaviour {
 
     private new Camera camera;
 
+    private float yOffsetGround = 10.6f;
     private float yOffset = 4;
 
     void Start() {
@@ -16,10 +17,20 @@ public class ParallaxScroller : MonoBehaviour {
         children = sprites.Select(sprite => {
             var renderer = new GameObject(sprite.name + " renderer")
                 .AddComponent<SpriteRenderer>();
-            var y = index == sprites.Length - 1 ? 0 : index * yOffset;
-            renderer.transform.position = new Vector3(0, y, 10 + index++);
+            float x;
+            float y;
+            if (index == 0) {
+                x = 0.6f;
+                y = yOffsetGround;
+            } else {
+                x = 0.0f;
+                y = index == sprites.Length - 1 ? 0 : index * yOffset;
+            }
+            renderer.transform.position = new Vector3(x, y, 10 + index++);
             renderer.sprite = sprite;
             renderer.sortingLayerID = SortingLayer.NameToID("BG");
+            renderer.transform.localScale = new Vector3(3, 3, 1);
+            
             return renderer;
         }).ToArray();
     }
@@ -29,12 +40,14 @@ public class ParallaxScroller : MonoBehaviour {
         var count = children.Length;
         var index = 0;
         foreach (var sprite in children) {
-            var y = Mathf.Max((camera.transform.position.y * ((count - index - 1)) * layerRatio), 0);
-            sprite.transform.position = new Vector3(
-                camera.transform.position.x,
-                camera.transform.position.y - y + (index == sprites.Length - 1 ? 0 : index * yOffset),
-                sprite.transform.position.z
-            );
+            if (index > 0) {
+                var y = Mathf.Max((camera.transform.position.y * ((count - index - 1)) * layerRatio), 0);
+                sprite.transform.position = new Vector3(
+                    camera.transform.position.x,
+                    camera.transform.position.y - y + (index == sprites.Length - 1 ? 0 : index * yOffset),
+                    sprite.transform.position.z
+                );
+            }
             index++;
         }
     }
