@@ -8,7 +8,7 @@ public class ParallaxScroller : MonoBehaviour {
 
     private new Camera camera;
 
-    private float yOffsetGround = 10.6f;
+    private float yOffsetGround = 11.0f;
     private float yOffset = 4;
 
     void Start() {
