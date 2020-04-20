@@ -25,7 +25,7 @@ public class CameraChase : MonoBehaviour {
             }
 
             desiredPosition = new Vector3(
-                desiredPosition.x,
+                camera.transform.position.x, //desiredPosition.x
                 Mathf.Max(startingHeight, desiredPosition.y),
                 camera.transform.position.z
             );
