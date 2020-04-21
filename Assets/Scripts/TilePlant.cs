@@ -153,7 +153,17 @@ public class TilePlant : MonoBehaviour {
         );
 
         if (tile is AnimatedTile) {
+            var extraLocation = location;
+            extraLocation.z = extraLocation.z + 1;
+            plantTilemap.SetTransformMatrix(
+                extraLocation,
+                Matrix4x4.Rotate(
+                    Quaternion.Euler(0, 0, (int)direction)
+                )
+            );
+
             StartTileAnimation(location, (AnimatedTile) tile);
+            StartTileAnimation(extraLocation, (AnimatedTile) leavesA);
         } else {
             plantTilemap.SetTile(location, tile);
         }
