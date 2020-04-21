@@ -74,10 +74,10 @@ public class Song : MonoBehaviour {
             gameObject.SendMessage("OnBeat");
         }
 
-        if (Input.GetKeyDown("a")) {
+        if (Input.GetKeyDown("a") || Input.GetKeyDown("left")) {
             gameObject.SendMessage("OnTurn", TurnDirection.Left);
         }
-        if (Input.GetKeyDown("d")) {
+        if (Input.GetKeyDown("d") || Input.GetKeyDown("right")) {
             gameObject.SendMessage("OnTurn", TurnDirection.Right);
         }
     }
