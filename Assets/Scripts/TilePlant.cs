@@ -100,11 +100,11 @@ public class TilePlant : MonoBehaviour {
         }
     }
 
-    private IEnumerator PlayTileAnimation(AnimatedTile tile, Vector3Int pos) {
+    private IEnumerator PlayTileAnimation(AnimatedTile tile, Vector3Int pos, Quaternion rot) {
         var go = new GameObject("Animation");
         var renderer = go.AddComponent<SpriteRenderer>();
         go.transform.position = plantTilemap.CellToWorld(pos) + new Vector3(.5f, .5f, 10);
-        go.transform.rotation = ExtractRotation(plantTilemap.GetTransformMatrix(pos));
+        go.transform.rotation = rot;
 
         float t = Time.time;
         for (var i = 0; i < tile.sprites.Length; i++) {
@@ -113,6 +113,11 @@ public class TilePlant : MonoBehaviour {
         }
         plantTilemap.SetTile(pos, tile.final);
         plantTilemap.RefreshTile(pos);
+        plantTilemap.SetTransformMatrix(
+            pos,
+            Matrix4x4.Rotate(rot)
+        );
+
         GameObject.Destroy(go);
     }
 
@@ -130,23 +135,22 @@ public class TilePlant : MonoBehaviour {
         return Quaternion.LookRotation(forward, upwards);
     }
 
-    public void StartTileAnimation(Vector3Int pos, AnimatedTile tile) {
+    public void StartTileAnimation(Vector3Int pos, AnimatedTile tile, Quaternion rotation) {
         plantTilemap.SetTile(pos, tile);
         plantTilemap.RefreshTile(pos);
-        StartCoroutine(PlayTileAnimation(tile, pos));
+        StartCoroutine(PlayTileAnimation(tile, pos, rotation));
     }
 
     public void UpdateLocation(Vector3Int location, PlantTilePhase phase, PlantTileType type, TravelDirection direction) {
         var tile = GetTile(phase, type);
+        var rotation = Quaternion.Euler(0, 0, (int) direction);
         plantTilemap.SetTransformMatrix(
             location,
-            Matrix4x4.Rotate(
-                Quaternion.Euler(0, 0, (int) direction)
-            )
+            Matrix4x4.Rotate(rotation)
         );
 
         if (tile is AnimatedTile) {
-            StartTileAnimation(location, (AnimatedTile) tile);
+            StartTileAnimation(location, (AnimatedTile) tile, rotation);
         } else {
             plantTilemap.SetTile(location, tile);
         }
