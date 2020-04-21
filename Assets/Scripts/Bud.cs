@@ -35,8 +35,6 @@ public class Bud {
         if(pendingSplit != null) {
             nextType = pendingSplit.type;
             travel = pendingSplit.rotation;
-            Debug.Log(nextType);
-            Debug.Log(travel);
         }
         plant.UpdateLocation(location, phase, nextType, travel);
 
@@ -149,14 +147,11 @@ public class Bud {
             default:
                 switch (splitter) {
                     case "splitter_lr":
-                        Debug.Log("Test3");
                         return new Split(TravelDirection.Left, TravelDirection.Right, TravelDirection.Right, PlantTileType.Straight);
                     case "splitter_lu":
-                        Debug.Log("TEST");
                         return new Split(TravelDirection.Left, TravelDirection.Up, TravelDirection.Right, PlantTileType.Left);
                         // case "splitter_ur":
                     default:
-                        Debug.Log("TEST2");
                         return new Split(TravelDirection.Up, TravelDirection.Right, TravelDirection.Down, PlantTileType.Tee);
                 }
         }
@@ -171,7 +166,6 @@ public class Bud {
         if (tile.name.StartsWith("splitter_")) {
             plant.branchAudioSource.Play();
             nextType = PlantTileType.Tee;
-            Debug.Log("Traveling: " + travel);
             pendingSplit = GetSplit(tile.name, travel);
             return true;
         }

@@ -21866,8 +21866,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4196c4bfc47c0b247a3d7c046e8fdffd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  budA: {fileID: 11400000, guid: 6551162dfff88b79da5c4426040e2d63, type: 2}
-  budB: {fileID: 11400000, guid: 0069ffdb0a477943289f60b7d7450c4f, type: 2}
+  budA: {fileID: 11400000, guid: 1b8047d5c06abb5bbaf1cad2bbb82825, type: 2}
+  budB: {fileID: 11400000, guid: ac951ae29136e4bdb9ed96946edc3512, type: 2}
   straightA: {fileID: 11400000, guid: 12f8bc601e90070f3905e07e2164f9c3, type: 2}
   straightB: {fileID: 11400000, guid: 3fbc6c4a379b9460caab47335dd29229, type: 2}
   rightA: {fileID: 11400000, guid: 2f90f54f34d2f2beebf247bed4f41a39, type: 2}
