@@ -21876,6 +21876,12 @@ MonoBehaviour:
   leftB: {fileID: 11400000, guid: 9a6e9ce04f99794a78488097c2a57d93, type: 2}
   teeA: {fileID: 11400000, guid: c9bc6cdacafd41643ad939174ad28605, type: 2}
   teeB: {fileID: 11400000, guid: 452c502958a13c6ce85e9144ca020cd9, type: 2}
+  eyesA: {fileID: 11400000, guid: e996db67e107ccf49ac7a52e9b3c10db, type: 2}
+  leavesA: {fileID: 11400000, guid: 8b2fe9bf0b36ac84b874c837039d82ae, type: 2}
+  spikesA: {fileID: 11400000, guid: 749353f8f0310634087cffb2133e512c, type: 2}
+  eyesB: {fileID: 11400000, guid: 7e5f98bc355044342819d403674784cb, type: 2}
+  leavesB: {fileID: 11400000, guid: f53d3f8067d420841bc9685b016703eb, type: 2}
+  spikesB: {fileID: 11400000, guid: 73550e984fd3ed049afeb920a922c481, type: 2}
   hitAudioSource: {fileID: 984417581}
   hitLowAudioSource: {fileID: 984417580}
   branchAudioSource: {fileID: 984417579}

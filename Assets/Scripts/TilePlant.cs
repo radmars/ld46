@@ -18,6 +18,13 @@ public class TilePlant : MonoBehaviour {
     public TileBase leftB;
     public TileBase teeA;
     public TileBase teeB;
+
+    public TileBase eyesA;
+    public TileBase leavesA;
+    public TileBase spikesA;
+    public TileBase eyesB;
+    public TileBase leavesB;
+    public TileBase spikesB;
     // Growth segment state information.
     private List<Bud> buds;
     private Grid grid;
